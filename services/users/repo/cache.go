@@ -12,4 +12,7 @@ func InitCache(pool *redis.Pool) UserRepository {
 	}
 }
 
-func (c *cache) findUserById() {}
+func (c *cache) findUserByID(id string) {
+	conn := c.pool.Get()
+	conn.Do("GET", id)
+}

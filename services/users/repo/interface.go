@@ -1,5 +1,5 @@
 package repo
 
 type UserRepository interface {
-	findUserById()
+	findUserByID(id string)
 }
