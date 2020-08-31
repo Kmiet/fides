@@ -3,6 +3,7 @@ module github.com/Kmiet/fides
 go 1.14
 
 require (
+	github.com/garyburd/redigo v1.6.2
 	github.com/gofiber/fiber v1.14.2
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/klauspost/compress v1.10.11 // indirect

@@ -1,5 +1,9 @@
 package events
 
-var USER_SERVICE = map[string]string{
-	"USER_DELETED": "USER_DELETED",
+type userServiceEvents struct {
+	USER_DELETED EventName
+}
+
+var USER_SERVICE = &userServiceEvents{
+	USER_DELETED: "USER_DELETED",
 }

@@ -9,21 +9,21 @@ type UserService interface {
 	// Create
 	register() (int, error)
 	// Read
-	findUserWithId(int) (int, error)
+	findUserWithID(int) (int, error)
 	findUserWithEmail(string) (string, error)
 	// Update
-	softDeleteUserWithId(int) (int, error)
+	softDeleteUserWithID(int) (int, error)
 	// Delete
-	deleteUserWithId(int) (int, error)
+	deleteUserWithID(int) (int, error)
 }
 
 type service struct {
-	mqProducer amqp.Channel
 	cache      repo.UserRepository
 	db         repo.UserRepository
+	mqProducer amqp.Producer
 }
 
-func InitService(cache repo.UserRepository, db repo.UserRepository, producer amqp.Channel) UserService {
+func InitService(cache repo.UserRepository, db repo.UserRepository, producer amqp.Producer) UserService {
 	return &service{
 		cache:      cache,
 		db:         db,
@@ -37,7 +37,7 @@ func (s *service) register() (int, error) {
 }
 
 // Read
-func (s *service) findUserWithId(id int) (int, error) {
+func (s *service) findUserWithID(id int) (int, error) {
 	return id, nil
 }
 
@@ -46,11 +46,11 @@ func (s *service) findUserWithEmail(email string) (string, error) {
 }
 
 // Update
-func (s *service) softDeleteUserWithId(id int) (int, error) {
+func (s *service) softDeleteUserWithID(id int) (int, error) {
 	return id, nil
 }
 
 // Delete
-func (s *service) deleteUserWithId(id int) (int, error) {
+func (s *service) deleteUserWithID(id int) (int, error) {
 	return id, nil
 }
