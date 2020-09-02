@@ -15,11 +15,7 @@ type consumer struct {
 	queue   *amqp.Queue
 }
 
-func InitConsumer(
-	exchangeName string,
-	queueName string,
-	topics []events.TopicName,
-) Consumer {
+func InitConsumer(exchangeName string, queueName string, topics []events.TopicName) Consumer {
 	channel := newChannel()
 	declareExchange(channel, exchangeName)
 	queue := bindQueue(channel, queueName, exchangeName, topics)

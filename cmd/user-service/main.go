@@ -9,7 +9,8 @@ import (
 	"github.com/Kmiet/fides/services/users"
 	amqpAPI "github.com/Kmiet/fides/services/users/api/amqp"
 	restAPI "github.com/Kmiet/fides/services/users/api/rest"
-	"github.com/Kmiet/fides/services/users/repo"
+	"github.com/Kmiet/fides/services/users/repo/cache"
+	"github.com/Kmiet/fides/services/users/repo/db"
 
 	"github.com/gofiber/fiber"
 )
@@ -26,13 +27,13 @@ func main() {
 	mongo.TestConnection(dbClient)
 	defer mongo.Disconnect(dbClient)
 
-	db := repo.InitDatabase(dbClient)
+	dbRepo := db.InitRepository(dbClient)
 
 	redisClient := redis.InitClient(REDIS_URI)
 	redis.TestConnection(redisClient)
 	defer redis.Disconnect(redisClient)
 
-	cache := repo.InitCache(redisClient)
+	cacheRepo := cache.InitRepository(redisClient)
 
 	amqp.Connect(RABBIT_MQ_URI)
 	defer amqp.Disconnect()
@@ -41,7 +42,7 @@ func main() {
 	amqpProducer := amqp.InitProducer("", "")
 	defer amqpProducer.Close()
 
-	userService := users.InitService(cache, db, amqpProducer)
+	userService := users.InitService(cacheRepo, dbRepo, amqpProducer)
 
 	amqpAPI.InitHandlers(userService)
 	go amqpAPI.Run(amqpConsumer)

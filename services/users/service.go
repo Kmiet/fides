@@ -2,14 +2,15 @@ package users
 
 import (
 	"github.com/Kmiet/fides/internal/net/amqp"
-	"github.com/Kmiet/fides/services/users/repo"
+	"github.com/Kmiet/fides/services/users/repo/cache"
+	"github.com/Kmiet/fides/services/users/repo/db"
 )
 
 type UserService interface {
 	// Create
-	register() (int, error)
+	Register(email string) (string, error)
 	// Read
-	findUserWithID(int) (int, error)
+	FindUserWithID(id string) (string, error)
 	findUserWithEmail(string) (string, error)
 	// Update
 	softDeleteUserWithID(int) (int, error)
@@ -18,26 +19,33 @@ type UserService interface {
 }
 
 type service struct {
-	cache      repo.UserRepository
-	db         repo.UserRepository
-	mqProducer amqp.Producer
+	cache cache.Repository
+	db    db.Repository
+	mq    amqp.Producer
 }
 
-func InitService(cache repo.UserRepository, db repo.UserRepository, producer amqp.Producer) UserService {
+func InitService(cacheRepo cache.Repository, dbRepo db.Repository, producer amqp.Producer) UserService {
 	return &service{
-		cache:      cache,
-		db:         db,
-		mqProducer: producer,
+		cache: cacheRepo,
+		db:    dbRepo,
+		mq:    producer,
 	}
 }
 
 // Create
-func (s *service) register() (int, error) {
-	return 0, nil
+func (s *service) Register(email string) (string, error) {
+	id, err := s.db.RegisterNewUser(email)
+	if err != nil {
+		return "", err
+	}
+	s.cache.SetUserByID(id, email)
+	return id, nil
 }
 
 // Read
-func (s *service) findUserWithID(id int) (int, error) {
+func (s *service) FindUserWithID(id string) (string, error) {
+	s.cache.GetUserByID(id)
+
 	return id, nil
 }
 
