@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,7 +15,7 @@ import (
 
 type Repository interface {
 	RegisterNewUser(email string) (string, error)
-	FindUserByID(id string)
+	FindUserByID(id string) (interface{}, error)
 }
 
 type database struct {
@@ -40,18 +41,26 @@ func (db *database) RegisterNewUser(email string) (string, error) {
 	res, err := db.users.InsertOne(ctx, bson.M{
 		"email": email,
 	})
+	fmt.Println(res.InsertedID.(primitive.ObjectID).Hex())
 	if err != nil {
 		return "", err
 	}
 	return res.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-func (db *database) FindUserByID(id string) {
+func (db *database) FindUserByID(id string) (interface{}, error) {
+	var user bson.M
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT_DURATION)
 	defer cancel()
-	db.users.FindOne(ctx, bson.M{
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return user, err
+	}
+
+	err = db.users.FindOne(ctx, bson.M{
 		"_id": bson.M{
-			"$eq": id,
+			"$eq": objID,
 		},
-	})
+	}).Decode(&user)
+	return user, err
 }

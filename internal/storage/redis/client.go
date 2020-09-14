@@ -8,8 +8,6 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-const _PING = "PING"
-
 func InitClient(uri string) *redis.Pool {
 	ps, ok := os.LookupEnv("REDIS_POOL_SIZE")
 	if !ok {
@@ -22,7 +20,7 @@ func InitClient(uri string) *redis.Pool {
 		IdleTimeout: 300 * time.Second,
 
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", uri)
+			c, err := redis.DialURL(uri)
 			if err != nil {
 				return nil, err
 			}
@@ -30,7 +28,7 @@ func InitClient(uri string) *redis.Pool {
 		},
 
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			_, err := c.Do(_PING)
+			_, err := c.Do(COMMANDS.PING)
 			return err
 		},
 	}
@@ -39,7 +37,7 @@ func InitClient(uri string) *redis.Pool {
 func TestConnection(pool *redis.Pool) {
 	conn := pool.Get()
 	defer conn.Close()
-	_, err := conn.Do(_PING)
+	_, err := conn.Do(COMMANDS.PING)
 	if err != nil {
 		panic(err)
 	}

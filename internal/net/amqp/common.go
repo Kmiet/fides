@@ -28,13 +28,13 @@ func newChannel() *amqp.Channel {
 
 func declareExchange(channel *amqp.Channel, name string) {
 	err := channel.ExchangeDeclare(
-		name,    // name
-		"topic", // type
-		true,    // durable
-		false,   // auto-deleted
-		false,   // internal
-		false,   // no-wait
-		nil,     // arguments
+		name,     // name
+		"direct", // type
+		true,     // durable
+		false,    // auto-deleted
+		false,    // internal
+		false,    // no-wait
+		nil,      // arguments
 	)
 	panicOnError(err)
 

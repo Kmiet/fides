@@ -2,3 +2,5 @@
 /bin/
 # Dev Volumes
 /volumes/
+# Environmental var
+*/.env

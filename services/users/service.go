@@ -10,7 +10,7 @@ type UserService interface {
 	// Create
 	Register(email string) (string, error)
 	// Read
-	FindUserWithID(id string) (string, error)
+	FindUserWithID(id string) (interface{}, error)
 	findUserWithEmail(string) (string, error)
 	// Update
 	softDeleteUserWithID(int) (int, error)
@@ -43,10 +43,12 @@ func (s *service) Register(email string) (string, error) {
 }
 
 // Read
-func (s *service) FindUserWithID(id string) (string, error) {
-	s.cache.GetUserByID(id)
+func (s *service) FindUserWithID(id string) (interface{}, error) {
+	// if user, err := s.cache.GetUserByID(id); err == nil {
+	// 	return user, err
+	// }
 
-	return id, nil
+	return s.db.FindUserByID(id)
 }
 
 func (s *service) findUserWithEmail(email string) (string, error) {
